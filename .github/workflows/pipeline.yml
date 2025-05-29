@@ -23,10 +23,9 @@ jobs:
         run: |
           docker build -t imgrep-test .
 
-      - name: 📷 Generate test image
+      - name: 📷 Download test image
         run: |
-          apt-get update && apt-get install -y imagemagick
-          convert -size 100x100 xc:white tests/test.jpg          
+          curl -L https://sample-videos.com/img/Sample-jpg-image-500kb.jpg -o tests/test.jpg       
 
       - name: ✅ Test - check health
         run: |
