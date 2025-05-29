@@ -23,6 +23,9 @@ jobs:
         run: |
           docker build -t imgrep-test .
 
+      - name: 🗂️ Ensure test folder exists
+        run: mkdir -p tests
+
       - name: 📷 Download test image
         run: |
           curl -L https://sample-videos.com/img/Sample-jpg-image-500kb.jpg -o tests/test.jpg       
