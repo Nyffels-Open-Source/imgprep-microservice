@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+*.zip
+*.tar.gz
+*.egg-info/
+.env
+.git/
+.gitignore
+Dockerfile
+docker-compose.yml
+tests/
+LICENSE

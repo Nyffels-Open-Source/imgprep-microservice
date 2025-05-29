@@ -1,0 +1,6 @@
+services:
+  imgrep:
+    build: .
+    container_name: imgrep
+    ports:
+      - "9000:8000"
