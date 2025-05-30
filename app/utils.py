@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from PIL import Image, ExifTags
+import pytesseract
 
 def apply_grayscale(img):
     return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)

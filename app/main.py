@@ -2,6 +2,8 @@ from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.responses import Response
 from app.processor import process_image
 import io
+import zipfile
+from fastapi.responses import StreamingResponse
 
 app = FastAPI(
     title="imgprep-microservice",
@@ -45,3 +47,29 @@ async def optimize_jpeg(
     img_bytes = await file.read()
     optimized = process_image(img_bytes, grayscale, denoise, contrast, deskew, rotate)
     return Response(content=optimized, media_type="image/jpeg")
+
+@app.post("/optimize-zip", tags=["Optimization"])
+async def optimize_zip(
+    file: UploadFile = File(..., description="ZIP file with JPEG images"),
+    grayscale: bool = Query(False),
+    denoise: bool = Query(False),
+    contrast: bool = Query(False),
+    deskew: bool = Query(False),
+    rotate: str = Query("none")
+):
+    zip_data = await file.read()
+    zip_input = zipfile.ZipFile(io.BytesIO(zip_data))
+
+    output_io = io.BytesIO()
+    with zipfile.ZipFile(output_io, mode="w", compression=zipfile.ZIP_DEFLATED) as zip_out:
+        for name in zip_input.namelist():
+            if name.lower().endswith(".jpg") or name.lower().endswith(".jpeg"):
+                with zip_input.open(name) as img_file:
+                    img_bytes = img_file.read()
+                    processed = process_image(img_bytes, grayscale, denoise, contrast, deskew, rotate)
+                    zip_out.writestr(name, processed)
+
+    output_io.seek(0)
+    return StreamingResponse(output_io, media_type="application/zip", headers={
+        "Content-Disposition": "attachment; filename=optimized_images.zip"
+    })
