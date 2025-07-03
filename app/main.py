@@ -27,7 +27,24 @@ def health():
     """
     return {"status": "ok"}
 
-@app.post("/optimize-jpeg", tags=["OptimizationJpeg"])
+@app.post(
+    "/optimize-jpeg",
+    tags=["OptimizationJpeg"],
+    response_class=Response,
+    responses={
+        200: {
+            "description": "Optimized image as JPEG",
+            "content": {
+                "image/jpeg": {
+                    "schema": {
+                        "type": "string",
+                        "format": "binary"
+                    }
+                }
+            }
+        }
+    }
+)
 async def optimize_jpeg(
     file: UploadFile = File(..., description="Image to optimize for OCR (JPEG, PNG, BMP, TIFF, WEBP)"),
     grayscale: bool = Query(False, description="Convert image to grayscale (recommended for OCR)"),
@@ -48,7 +65,24 @@ async def optimize_jpeg(
     optimized = process_image(img_bytes, grayscale, denoise, contrast, deskew, rotate)
     return Response(content=optimized, media_type="image/jpeg")
 
-@app.post("/optimize-zip", tags=["OptimizationZip"])
+@app.post(
+    "/optimize-zip",
+    tags=["OptimizationZip"],
+    response_class=StreamingResponse,
+    responses={
+        200: {
+            "description": "Optimized ZIP archive",
+            "content": {
+                "application/zip": {
+                    "schema": {
+                        "type": "string",
+                        "format": "binary"
+                    }
+                }
+            }
+        }
+    }
+)
 async def optimize_zip(
     file: UploadFile = File(..., description="ZIP file with JPEG images"),
     grayscale: bool = Query(False),
